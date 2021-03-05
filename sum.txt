@@ -1,0 +1,24 @@
+
+FSUM
+r1 = M[sp+4]
+BNe 1,r1,pc + 12
+rv = 1
+ret
+sp = sp - 4
+r1 = r1 - 1
+M[sp] = r1
+call<sum>
+sp = sp + 4
+R1 = M[sp+4]
+rv = rv + r1
+ret
+ENDF
+
+
+
+START
+sp = sp - 4
+M[sp] = 10008
+call<sum>
+sp = sp + 4
+END

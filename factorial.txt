@@ -1,0 +1,32 @@
+FFACT
+r2 = sp + 4
+R1 = M[r2]
+BNE r1, 1, PC + 12
+RV = 1
+RET
+r2 =sp + 4
+r1 =  M[r2]
+R1 =R1 - 1
+SP = SP - 4
+M[SP] = r1
+CALL <fact>
+SP = SP + 4
+R2 = sp + 4
+R1 = M[R2]
+RV = RV * R1
+RET
+ENDF
+
+
+START
+sp = sp - 4
+M[sp] = 7
+call<fact>
+sp = sp + 4
+END
+
+
+
+
+
+

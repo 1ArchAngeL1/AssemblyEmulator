@@ -1,0 +1,23 @@
+FFIB
+r1 = M[sp + 4]
+r2 = 0
+r3 = 1
+r4 = 0
+r1 = r1-1
+BGE r4,r1,pc + 24
+r4 = r4 + 1
+r5 = r3
+r3 = r3 + r2
+r2 = r5
+jmp pc - 20
+rv = r2
+ENDF
+
+
+
+START
+sp = sp - 4
+M[sp] = 6
+call<fib>
+sp = sp + 4
+end
