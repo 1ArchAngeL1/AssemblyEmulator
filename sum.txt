@@ -1,7 +1,7 @@
 
 FSUM
 r1 = M[sp+4]
-BNe 1,r1,pc + 12
+BNE 1,r1,pc + 12
 rv = 1
 ret
 sp = sp - 4

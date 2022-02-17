@@ -2,39 +2,41 @@
 #define _EXECUTE_H
 
 #include<unordered_set>
-#include<bits/stdc++.h>
 #include<iostream>
 #include <unordered_map>
 #include <vector>
+#include<fstream>
 
 
 using namespace std;
 
-void programCursor(string instr,int & index);
+void program_cursor(string instr, long &index);
 
-bool is_Load(string instr);
-bool is_Store(string instr);
-bool is_ALU(string instr);
+bool is_load(string instr);
+
+bool is_store(string instr);
+
+bool is_alu(string instr);
+
 bool is_JMP(string instr);
-bool is_BRANCH(string instr);
-bool is_CALL(string instr);
 
-void EXEC();
+bool is_branch(string instr);
 
-void LOAD(string instr);
+bool is_call(string instr);
 
-void ALU(string instr);
+void exec();
 
-void STORE(string instr);
+void load(string instr);
 
-void BRANCH(string instr,int & index);
+void alu(string instr);
 
-void JMP(string instr,int & index);
+void store(string instr);
 
-void CALL(string functuon_name);
+void branch(string instr, long &index);
 
+void jmp(string instr, long &index);
 
-
+void call(string function_name);
 
 
 #endif

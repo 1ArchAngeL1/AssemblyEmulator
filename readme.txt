@@ -7,4 +7,4 @@ M[RK] = .n RM
 M[RK + c] = .n m
 Rk = .Z M[RM + c]
 call<funcname>
-JMP pc+k
+jmp pc+k

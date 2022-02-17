@@ -2,13 +2,11 @@
 #include "execute.h"
 
 
-
-
 using namespace std;
 
-int main(){
+int main() {
     string filename;
-    welcome(filename);  
+    welcome(filename);
     startup(filename);
     return 0;
 }

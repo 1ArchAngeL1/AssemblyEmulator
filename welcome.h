@@ -9,19 +9,17 @@ using namespace std;
 
 void init_funcs();
 
-void welcome(string & filename);
+void welcome(string &filename);
 
 void start();
 
-void startup(string & file_name);
+void startup(string &file_name);
 
-void uploadCode(ifstream & input);
+void upload_code(ifstream &input);
 
-string upperCode(string code);
+string upper_code(string code);
 
-void validateLines();
-
-
+void validate_lines();
 
 
 #endif

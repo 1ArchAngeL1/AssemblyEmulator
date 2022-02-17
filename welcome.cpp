@@ -3,56 +3,56 @@
 
 using namespace std;
 
+unordered_map<string, long> registers;
 
-unordered_map<string,int> registers;
-extern int * sp;
+extern long *sp;
+
 vector<string> assembler_code;
-unordered_map  <string,vector<string> > functions;
 
+unordered_map<string, vector<string> > functions;
 
-
-void welcome(string & filename){
+void welcome(string &filename) {
     cout << "this emulator takes assembly code and executes it\n"
-    << "i have already included some examples and you can run them \n"
-    << "by using specific numbers below or you can execute your own file\n"
-    << "by inputting your file path" << endl;
-    
-    cout << "choose 0 if you want to input your own filepath\n" 
-    << "choose 1 if you want to run factorial program\n"  
-    << "choose 2 if you want to run fibonacci program\n" 
-    << "choose 3 if you want to run sum program" << endl;
+         << "i have already included some examples and you can run them \n"
+         << "by using specific numbers below or you can execute your own file\n"
+         << "by inputting your file path" << endl;
+
+    cout << "choose 0 if you want to input your own filepath\n"
+         << "choose 1 if you want to run factorial program\n"
+         << "choose 2 if you want to run fibonacci program\n"
+         << "choose 3 if you want to run sum program" << endl;
 
     cout << "remember that you can declare your functions anywhere you want in file\n"
-    << "but you must put your main code in START/..../END uppercase is not necessary\n"
-    << "also you can use tab and space anywhere you want bust consider that your line shouldn'y contain\n"
-    << "ALU STORE or LOAD at the same time, otherwise it won't be executed and program will stop" << endl;
+         << "but you must put your main code in START/..../END uppercase is not necessary\n"
+         << "also you can use tab and space anywhere you want but consider that your line shouldn't contain\n"
+         << "alu store or load at the same time, otherwise it won't be executed and program will crash" << endl;
 
 
-    int choice;
+    long choice;
     cout << "enter your choice" << endl;
     cin >> choice;
-    switch(choice){
+    switch (choice) {
         case 0:
             cout << "enter file name below" << endl;
-            cin >> filename; 
+            cin >> filename;
             break;
         case 1:
-            filename = "factorial.txt";
+            filename = "../factorial.txt";
             break;
         case 2:
-            filename = "fibonacci.txt";
+            filename = "../fibonacci.txt";
             break;
         case 3:
-             filename = "sum.txt";
-             break;
-    }   
+            filename = "../sum.txt";
+            break;
+    }
 }
 
-void start(){
-    for(int i = 0;i < assembler_code.size();++i){
-        if(assembler_code[i] == "START"){
-            int index = i+1;
-            while(assembler_code[index] != "END"){
+void start() {
+    for (long i = 0; i < assembler_code.size(); ++i) {
+        if (assembler_code[i] == "START") {
+            long index = i + 1;
+            while (assembler_code[index] != "END") {
                 functions["START"].push_back(assembler_code[index]);
                 index++;
             }
@@ -60,13 +60,12 @@ void start(){
     }
 }
 
-
-void init_funcs(){
-    for(int i = 0; i < assembler_code.size();++i){
-        if(assembler_code[i][0] == 'F'){
-           string name = assembler_code[i].substr(1);
+void init_funcs() {
+    for (long i = 0; i < assembler_code.size(); ++i) {
+        if (assembler_code[i][0] == 'F') {
+            string name = assembler_code[i].substr(1);
             i++;
-            while(assembler_code[i] != "ENDF"){
+            while (assembler_code[i] != "ENDF") {
                 functions[name].push_back(assembler_code[i]);
                 i++;
             }
@@ -74,32 +73,27 @@ void init_funcs(){
     }
 }
 
-
-
-string filter(string line){
+string filter(string line) {
     string temp = line;
-    for(int i = temp.length()-1;i >= 0;i--){
-        if(temp[i] == 32 || temp[i] == 9){
-            temp.erase(i,1);
+    for (long i = temp.length() - 1; i >= 0; i--) {
+        if (temp[i] == ' ' || temp[i] == '  ' || temp[i] == '!') {
+            temp.erase(i, 1);
         }
     }
     return temp;
 }
 
-
-
-void validateLines(){
-    for(int i = 0;i < assembler_code.size();++i){
+void validate_lines() {
+    for (long i = 0; i < assembler_code.size(); ++i) {
         string line = assembler_code[i];
         assembler_code[i] = filter(line);
     }
 }
 
-
-string upperCode(string code){
+string upper_code(string code) {
     string temp = code;
-    for(int i = 0;i < temp.length();i++){
-        if(temp[i] >= 'a' && temp[i] <= 'z'){
+    for (long i = 0; i < temp.length(); i++) {
+        if (temp[i] >= 'a' && temp[i] <= 'z') {
             char a = temp[i];
             temp[i] = toupper(a);
         }
@@ -107,32 +101,28 @@ string upperCode(string code){
     return temp;
 }
 
-
-void uploadCode(ifstream &input){
+void upload_code(ifstream &input) {
     string info;
-    while(getline(input,info)){
-        if(info != ""){
-            string forUpload = upperCode(info);
+    while (getline(input, info)) {
+        if (info != "") {
+            string forUpload = upper_code(info);
             assembler_code.push_back(forUpload);
         }
     }
     input.close();
 }
 
-
-
-void startup(string & file_name){
+void startup(string &file_name) {
     ifstream input(file_name);
-    if(input.is_open()){
-        uploadCode(input);
-        validateLines();
-        registers["SP"] = (int)sp;
+    if (input.is_open()) {
+        upload_code(input);
+        validate_lines();
+        registers["SP"] = (long) (sp);
         start();
         init_funcs();
-        EXEC();
-    
-    }else{
+        exec();
+
+    } else {
         cout << "ERROR: couldn't open file" << endl;
     }
 }
-
