@@ -1,13 +1,13 @@
 #include <sstream>
 #include "execute.h"
 
-extern unordered_map<string, long> registers;
+
 long memory[200000];
-extern unordered_map<string, vector<string> > functions;
-long *sp = memory + 199900;
-extern vector<string> assembler_code;
-unordered_set<string> BRANCH_EXMP = {"BLT", "BLE", "BEQ", "BNE", "BGT", "BGE"};
-unordered_set<char> OPERATORS = {'+', '-', '/', '*'};
+
+long *sp = memory + 199999;
+
+static unordered_set<string> BRANCH_EXMP = {"BLT", "BLE", "BEQ", "BNE", "BGT", "BGE"};
+static unordered_set<char> OPERATORS = {'+', '-', '/', '*'};
 
 
 using namespace std;
@@ -40,10 +40,10 @@ void load(string instr) {
     } else {
         mem = mem.substr(1);
     }
-    for (long i = mem.length() - 1; i >= 0; --i) {
+    for (int i = mem.length() - 1; i >= 0; --i) {
         if (mem[i] == ']' || mem[i] == '[')mem.erase(i, 1);
     }
-    for (long i = 0; i < mem.length(); ++i) {
+    for (int i = 0; i < mem.length(); ++i) {
         if (OPERATORS.find(mem[i]) != OPERATORS.end()) {
             complex = true;
             oper = mem[i];
@@ -84,7 +84,7 @@ void load(string instr) {
             registers[where_to_load] = *((short *) temp_ptr);
             break;
         case 4:
-            registers[where_to_load] = *(temp_ptr);
+            registers[where_to_load] = *((int *) temp_ptr);
             break;
         case 8:
             registers[where_to_load] = *((long long *) temp_ptr);
@@ -107,7 +107,7 @@ void alu(string instr) {
         if (counter)equation = saver;
         counter++;
     }
-    for (long i = 0; i < equation.length(); ++i) {
+    for (int i = 0; i < equation.length(); ++i) {
         if (OPERATORS.find(equation[i]) != OPERATORS.end()) {
             is_complex = true;
             equa_operator = equation[i];
@@ -149,7 +149,7 @@ void alu(string instr) {
                 registers[saver_reg] = (short) search_out(equation);
                 break;
             case 4:
-                registers[saver_reg] = search_out(equation);
+                registers[saver_reg] = (int) search_out(equation);
                 break;
             case 8:
                 registers[saver_reg] = (long long) search_out(equation);
@@ -173,10 +173,10 @@ void store(string instr) {
     string adress = parts[0];
     string val = parts[1];
     adress = adress.substr(1);\
-    for (long i = adress.length() - 1; i >= 0; --i) {
+    for (int i = adress.length() - 1; i >= 0; --i) {
         if (adress[i] == ']' || adress[i] == '[')adress.erase(i, 1);
     }
-    for (long i = 0; i < adress.length(); ++i) {
+    for (int i = 0; i < adress.length(); ++i) {
         if (OPERATORS.find(adress[i]) != OPERATORS.end()) {
             is_complex_adress = true;
             adress_operator = adress[i];
@@ -223,14 +223,14 @@ void store(string instr) {
         case 2:
             *((short *) temp_ptr) = (short) real_val;
         case 4:
-            *temp_ptr = real_val;
+            *((int *) temp_ptr) = (int)real_val;
         case 8:
             *((long long *) temp_ptr) = (long long) real_val;
     }
 }
 
 //{"BLT", "BLE", "BEQ", "BNE", "BGT", "BGE"};
-void branch(string instr, long &index) {
+void branch(string instr, int &index) {
     string type = instr.substr(0, 3);
     vector<string> parts;
     stringstream dividor(instr.substr(3));
@@ -260,10 +260,10 @@ void branch(string instr, long &index) {
 }
 
 
-void jmp(string instr, long &index) {
+void jmp(string instr, int &index) {
     instr = instr.substr(3);
     char oper;
-    for (long i = 0; i < instr.length(); ++i) {
+    for (int i = 0; i < instr.length(); ++i) {
         if (OPERATORS.find(instr[i]) != OPERATORS.end()) {
             oper = instr[i];
         }
@@ -284,14 +284,13 @@ void jmp(string instr, long &index) {
 
 
 void call(string function_name) {
-    cout << 'mevidaa' << endl;
     string namee = function_name.substr(4);
-    for (long i = namee.length() - 1; i >= 0; --i) {
+    for (int i = namee.length() - 1; i >= 0; --i) {
         if (namee[i] == '<' || namee[i] == '>')namee.erase(i, 1);
     }
     registers["SP"] -= 4;
     vector<string> temp = functions[namee];
-    for (long i = 0; i < temp.size(); ++i) {
+    for (int i = 0; i < temp.size(); ++i) {
         cout << "Working on..: " << temp[i] << endl;
         if (temp[i] == "RET") {
             registers["SP"] += 4;
@@ -303,7 +302,7 @@ void call(string function_name) {
 }
 
 
-void program_cursor(string instr, long &index) {
+void program_cursor(string instr, int &index) {
     if (sp <= memory) {
         for (long i = 0; i < 3; i++) {
             cout << "" << endl;
@@ -315,7 +314,7 @@ void program_cursor(string instr, long &index) {
         load(instr);
     } else if (is_store(instr)) {
         store(instr);
-    } else if (is_JMP(instr)) {
+    } else if (is_jmp(instr)) {
         jmp(instr, index);
     } else if (is_branch(instr)) {
         branch(instr, index);
@@ -330,9 +329,9 @@ void program_cursor(string instr, long &index) {
 
 
 bool is_load(string instr) {
-    for (long i = 0; i < instr.length(); ++i) {
+    for (int i = 0; i < instr.length(); ++i) {
         if (instr[i] == '=') {
-            for (long j = i; j < instr.length(); j++) {
+            for (int j = i; j < instr.length(); j++) {
                 if (instr[j] == 'M')return true;
             }
             return false;
@@ -348,7 +347,7 @@ bool is_store(string instr) {
 }
 
 bool is_alu(string instr) {
-    for (long i = 0; i < instr.length(); ++i) {
+    for (int i = 0; i < instr.length(); ++i) {
         if (instr[i] == '=') {
             for (long j = i; j < instr.length(); j++) {
                 if (instr[j] == 'M')return false;
@@ -360,7 +359,7 @@ bool is_alu(string instr) {
 }
 
 
-bool is_JMP(string instr) {
+bool is_jmp(string instr) {
     if (instr.substr(0, 3) == "JMP")return true;
     return false;
 }
@@ -378,19 +377,10 @@ bool is_call(string instr) {
 
 void exec() {
     vector<string> code = functions["START"];
-    for (long i = 0; i < code.size(); ++i) {
+    for (int i = 0; i < code.size(); ++i) {
         cout << "Working on....: " << code[i] << endl;
         if (code[i] == "RET")break;
         program_cursor(code[i], i);
     }
     cout << "Final Result: " << registers["RV"] << endl;
 }
-
-
-
-
-
-
-
-
-

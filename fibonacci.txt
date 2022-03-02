@@ -19,7 +19,7 @@ ENDF
 
 START
 sp = sp - 4
-M[sp] = 6
+M[sp] = .4 6
 call<fib>
 sp = sp + 4
 end

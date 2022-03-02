@@ -2,6 +2,7 @@
 #define _WELCOME_H
 
 #include<string>
+#include "execute.h"
 #include<iostream>
 
 using namespace std;

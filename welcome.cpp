@@ -1,5 +1,5 @@
 #include "welcome.h"
-#include "execute.h"
+
 
 using namespace std;
 
@@ -76,7 +76,7 @@ void init_funcs() {
 string filter(string line) {
     string temp = line;
     for (long i = temp.length() - 1; i >= 0; i--) {
-        if (temp[i] == ' ' || temp[i] == '  ' || temp[i] == '!') {
+        if (temp[i] == ' ' || temp[i] == '!') {
             temp.erase(i, 1);
         }
     }

@@ -10,7 +10,7 @@
 
 using namespace std;
 
-void program_cursor(string instr, long &index);
+void program_cursor(string instr, int &index);
 
 bool is_load(string instr);
 
@@ -18,7 +18,7 @@ bool is_store(string instr);
 
 bool is_alu(string instr);
 
-bool is_JMP(string instr);
+bool is_jmp(string instr);
 
 bool is_branch(string instr);
 
@@ -32,11 +32,16 @@ void alu(string instr);
 
 void store(string instr);
 
-void branch(string instr, long &index);
+void branch(string instr, int &index);
 
-void jmp(string instr, long &index);
+void jmp(string instr, int &index);
 
 void call(string function_name);
 
+extern vector<string> assembler_code;
+
+extern unordered_map<string, long> registers;
+
+extern unordered_map<string, vector<string> > functions;
 
 #endif
