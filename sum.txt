@@ -17,7 +17,7 @@ ENDF
 
 START
 sp = sp - 4
-M[sp] = 10008
+M[sp] = .4 10
 call<sum>
 sp = sp + 4
 END

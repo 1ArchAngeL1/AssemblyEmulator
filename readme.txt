@@ -1,5 +1,5 @@
 use this command to compile the code 
-g++ -m32  *.cpp -o mainn.out -fpermissive
+g++ -m32  *.cpp -o main.out -fpermissive
 all vallid forms
 Rk = Rn+Rm
 Rk = Rn + m

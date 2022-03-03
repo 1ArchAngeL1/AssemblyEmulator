@@ -1,3 +1,5 @@
+
+
 FFACT
 r2 = sp + 4
 R1 = M[r2]
@@ -20,7 +22,7 @@ ENDF
 
 START
 sp = sp - 4
-M[sp] = 7
+M[sp] = .4 5
 call<fact>
 sp = sp + 4
 END

@@ -49,9 +49,9 @@ void welcome(string &filename) {
 }
 
 void start() {
-    for (long i = 0; i < assembler_code.size(); ++i) {
+    for (int i = 0; i < assembler_code.size(); ++i) {
         if (assembler_code[i] == "START") {
-            long index = i + 1;
+            int index = i + 1;
             while (assembler_code[index] != "END") {
                 functions["START"].push_back(assembler_code[index]);
                 index++;
@@ -61,7 +61,7 @@ void start() {
 }
 
 void init_funcs() {
-    for (long i = 0; i < assembler_code.size(); ++i) {
+    for (int i = 0; i < assembler_code.size(); ++i) {
         if (assembler_code[i][0] == 'F') {
             string name = assembler_code[i].substr(1);
             i++;
@@ -75,8 +75,8 @@ void init_funcs() {
 
 string filter(string line) {
     string temp = line;
-    for (long i = temp.length() - 1; i >= 0; i--) {
-        if (temp[i] == ' ' || temp[i] == '!') {
+    for (int i = temp.length() - 1; i >= 0; i--) {
+        if (temp[i] == ' ' || temp[i] == '  ' || temp[i] == '!') {
             temp.erase(i, 1);
         }
     }
@@ -84,7 +84,7 @@ string filter(string line) {
 }
 
 void validate_lines() {
-    for (long i = 0; i < assembler_code.size(); ++i) {
+    for (int i = 0; i < assembler_code.size(); ++i) {
         string line = assembler_code[i];
         assembler_code[i] = filter(line);
     }
@@ -92,7 +92,7 @@ void validate_lines() {
 
 string upper_code(string code) {
     string temp = code;
-    for (long i = 0; i < temp.length(); i++) {
+    for (int i = 0; i < temp.length(); i++) {
         if (temp[i] >= 'a' && temp[i] <= 'z') {
             char a = temp[i];
             temp[i] = toupper(a);
@@ -117,7 +117,7 @@ void startup(string &file_name) {
     if (input.is_open()) {
         upload_code(input);
         validate_lines();
-        registers["SP"] = (long) (sp);
+        registers["SP"] = (int64_t) (sp);
         start();
         init_funcs();
         exec();

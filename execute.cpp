@@ -2,13 +2,13 @@
 #include "execute.h"
 
 
-long memory[200000];
+int64_t memory[200000];
 
-long *sp = memory + 199999;
+int64_t *sp = memory + 199999;
 
 static unordered_set<string> BRANCH_EXMP = {"BLT", "BLE", "BEQ", "BNE", "BGT", "BGE"};
-static unordered_set<char> OPERATORS = {'+', '-', '/', '*'};
 
+static unordered_set<char> OPERATORS = {'+', '-', '/', '*'};
 
 using namespace std;
 
@@ -33,7 +33,7 @@ void load(string instr) {
         parts.push_back(temp);
     }
     string mem = parts[1];
-    string where_to_load = parts[0];
+    string reg = parts[0];
     if (mem[0] == '.') {
         type = mem[1] - '0';
         mem = mem.substr(3);
@@ -75,19 +75,19 @@ void load(string instr) {
     }
     switch (type) {
         case 0:
-            registers[where_to_load] = *(temp_ptr);
+            registers[reg] = *(temp_ptr);
             break;
         case 1:
-            registers[where_to_load] = *((char *) temp_ptr);
+            registers[reg] = *((int8_t *) temp_ptr);
             break;
         case 2:
-            registers[where_to_load] = *((short *) temp_ptr);
+            registers[reg] = *((int16_t *) temp_ptr);
             break;
         case 4:
-            registers[where_to_load] = *((int *) temp_ptr);
+            registers[reg] = *((int32_t *) temp_ptr);
             break;
         case 8:
-            registers[where_to_load] = *((long long *) temp_ptr);
+            registers[reg] = *((int64_t *) temp_ptr);
             break;
     }
 }
@@ -101,7 +101,7 @@ void alu(string instr) {
     string saver_reg;
     string equation;
     string saver;
-    long counter = 0;
+    int counter = 0;
     while (getline(dividor, saver, '=')) {
         if (!counter)saver_reg = saver;
         if (counter)equation = saver;
@@ -143,16 +143,16 @@ void alu(string instr) {
                 registers[saver_reg] = search_out(equation);
                 break;
             case 1:
-                registers[saver_reg] = (char) search_out(equation);
+                registers[saver_reg] = (int8_t) search_out(equation);
                 break;
             case 2:
-                registers[saver_reg] = (short) search_out(equation);
+                registers[saver_reg] = (int16_t) search_out(equation);
                 break;
             case 4:
-                registers[saver_reg] = (int) search_out(equation);
+                registers[saver_reg] = (int32_t) search_out(equation);
                 break;
             case 8:
-                registers[saver_reg] = (long long) search_out(equation);
+                registers[saver_reg] = (int64_t) search_out(equation);
                 break;
         }
 
@@ -172,7 +172,7 @@ void store(string instr) {
     }
     string adress = parts[0];
     string val = parts[1];
-    adress = adress.substr(1);\
+    adress = adress.substr(1);
     for (int i = adress.length() - 1; i >= 0; --i) {
         if (adress[i] == ']' || adress[i] == '[')adress.erase(i, 1);
     }
@@ -209,23 +209,18 @@ void store(string instr) {
         type = val[1] - '0';
         val = val.substr(2);
     }
-    long real_val;
-    if (val[0] == 'R') {
-        real_val = registers[val];
-    } else {
-        real_val = stoi(val);
-    }
+    long real_val =  search_out(val);
     switch (type) {
         case 0:
             *temp_ptr = real_val;
         case 1:
-            *((char *) temp_ptr) = (char) real_val;
+            *((int8_t *) temp_ptr) = (int8_t) real_val;
         case 2:
-            *((short *) temp_ptr) = (short) real_val;
+            *((int16_t *) temp_ptr) = (int16_t) real_val;
         case 4:
-            *((int *) temp_ptr) = (int)real_val;
+            *((int32_t *) temp_ptr) = (int32_t) real_val;
         case 8:
-            *((long long *) temp_ptr) = (long long) real_val;
+            *((int64_t*) temp_ptr) = (int64_t) real_val;
     }
 }
 
@@ -274,7 +269,7 @@ void jmp(string instr, int &index) {
     while (getline(dividor, num_saver, oper)) {
         number = num_saver;
     }
-    long num = stoi(number);
+    int num = stoi(number);
     if (oper == '+') {
         index += num / 4 - 1;
     } else if (oper == '-') {
@@ -284,12 +279,12 @@ void jmp(string instr, int &index) {
 
 
 void call(string function_name) {
-    string namee = function_name.substr(4);
-    for (int i = namee.length() - 1; i >= 0; --i) {
-        if (namee[i] == '<' || namee[i] == '>')namee.erase(i, 1);
+    string func_name = function_name.substr(4);
+    for (int i = func_name.length() - 1; i >= 0; --i) {
+        if (func_name[i] == '<' || func_name[i] == '>')func_name.erase(i, 1);
     }
     registers["SP"] -= 4;
-    vector<string> temp = functions[namee];
+    vector<string> temp = functions[func_name];
     for (int i = 0; i < temp.size(); ++i) {
         cout << "Working on..: " << temp[i] << endl;
         if (temp[i] == "RET") {
@@ -304,10 +299,10 @@ void call(string function_name) {
 
 void program_cursor(string instr, int &index) {
     if (sp <= memory) {
-        for (long i = 0; i < 3; i++) {
-            cout << "" << endl;
+        for (int i = 0; i < 3; i++) {
+            cout << endl;
         }
-        cout << "ooops... stackoverflow :)" << endl;
+        cout << "stackoverflow :)" << endl;
         exit(1);
     }
     if (is_load(instr)) {
@@ -347,15 +342,12 @@ bool is_store(string instr) {
 }
 
 bool is_alu(string instr) {
+    bool has_equal = false;
     for (int i = 0; i < instr.length(); ++i) {
-        if (instr[i] == '=') {
-            for (long j = i; j < instr.length(); j++) {
-                if (instr[j] == 'M')return false;
-            }
-            return true;
-        }
+        if (instr[i] == 'M')return false;
+        if (instr[i] == '=')has_equal = true;
     }
-    return false;
+    return has_equal;
 }
 
 
@@ -376,7 +368,7 @@ bool is_call(string instr) {
 
 
 void exec() {
-    vector<string> code = functions["START"];
+    vector<string> &code = functions["START"];
     for (int i = 0; i < code.size(); ++i) {
         cout << "Working on....: " << code[i] << endl;
         if (code[i] == "RET")break;
